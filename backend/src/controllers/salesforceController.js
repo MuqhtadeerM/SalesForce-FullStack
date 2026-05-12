@@ -6,6 +6,7 @@ import {
   authorizeSalesforceService,
   getConnection,
 } from "../services/salesforceService.js";
+import { env } from "../config/env.js";
 
 export const loginToSalesforce = asyncHandler(async (req, res) => {
   const loginUrl = getLoginUrlService();
@@ -36,15 +37,10 @@ export const oauthCallback = asyncHandler(async (req, res) => {
       .json(new ApiResponse(false, "Authorization code missing"));
   }
 
-  const data = await authorizeSalesforceService(code);
+  await authorizeSalesforceService(code);
 
-  res.status(200).json(
-    new ApiResponse(true, MESSAGES.LOGIN_SUCCESS, {
-      accessToken: data.accessToken,
-      instanceUrl: data.instanceUrl,
-      userId: data.userInfo.id,
-    }),
-  );
+  // Pass auth=true so frontend knows login succeeded
+  res.redirect(`${env.CLIENT_URL}/dashboard?auth=true`);
 });
 
 export const getValidationRules = asyncHandler(async (req, res) => {

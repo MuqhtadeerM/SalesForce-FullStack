@@ -23,6 +23,7 @@ const loadToken = () => {
 export const getLoginUrlService = () => {
   return oauth2.getAuthorizationUrl({
     scope: "api refresh_token full",
+    prompt: "login",
   });
 };
 

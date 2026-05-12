@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   getValidationRules,
   toggleSingleRule,
@@ -16,6 +17,22 @@ export default function DashboardPage() {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [fetched, setFetched] = useState(false);
+
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const auth = searchParams.get("auth");
+    if (auth === "true") {
+      localStorage.setItem("sf_authenticated", "true");
+      navigate("/dashboard", { replace: true });
+    } else {
+      const isAuth = localStorage.getItem("sf_authenticated");
+      if (!isAuth) {
+        navigate("/", { replace: true });
+      }
+    }
+  }, []);
 
   const showMessage = (msg) => {
     setMessage(msg);
@@ -91,12 +108,12 @@ export default function DashboardPage() {
   const inactiveCount = rules.filter((r) => !r.Active).length;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen text-white bg-gray-950">
       {/* Header */}
-      <header className="bg-gray-900 border-b border-gray-800 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <header className="px-6 py-4 bg-gray-900 border-b border-gray-800">
+        <div className="flex items-center justify-between max-w-6xl mx-auto">
           <div className="flex items-center gap-3">
-            <div className="bg-blue-600 rounded-lg p-2">
+            <div className="p-2 bg-blue-600 rounded-lg">
               <svg
                 className="w-5 h-5 text-white"
                 fill="currentColor"
@@ -114,22 +131,22 @@ export default function DashboardPage() {
           </div>
           <button
             onClick={loginToSalesforce}
-            className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-3 py-2 rounded-lg transition-all"
+            className="px-3 py-2 text-xs text-gray-400 transition-all border border-gray-700 rounded-lg hover:text-white hover:border-gray-500"
           >
             Re-authenticate
           </button>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="max-w-6xl px-6 py-8 mx-auto">
         {/* Notifications */}
         {message && (
-          <div className="mb-4 bg-green-900 border border-green-700 text-green-300 px-4 py-3 rounded-xl text-sm">
+          <div className="px-4 py-3 mb-4 text-sm text-green-300 bg-green-900 border border-green-700 rounded-xl">
             ✓ {message}
           </div>
         )}
         {error && (
-          <div className="mb-4 bg-red-900 border border-red-700 text-red-300 px-4 py-3 rounded-xl text-sm">
+          <div className="px-4 py-3 mb-4 text-sm text-red-300 bg-red-900 border border-red-700 rounded-xl">
             ✗ {error}
           </div>
         )}
@@ -137,16 +154,16 @@ export default function DashboardPage() {
         {/* Stats Cards */}
         {fetched && (
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-              <p className="text-gray-400 text-xs mb-1">Total Rules</p>
+            <div className="p-4 bg-gray-900 border border-gray-800 rounded-xl">
+              <p className="mb-1 text-xs text-gray-400">Total Rules</p>
               <p className="text-3xl font-bold text-white">{rules.length}</p>
             </div>
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-              <p className="text-gray-400 text-xs mb-1">Active</p>
+            <div className="p-4 bg-gray-900 border border-gray-800 rounded-xl">
+              <p className="mb-1 text-xs text-gray-400">Active</p>
               <p className="text-3xl font-bold text-green-400">{activeCount}</p>
             </div>
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-              <p className="text-gray-400 text-xs mb-1">Inactive</p>
+            <div className="p-4 bg-gray-900 border border-gray-800 rounded-xl">
+              <p className="mb-1 text-xs text-gray-400">Inactive</p>
               <p className="text-3xl font-bold text-red-400">{inactiveCount}</p>
             </div>
           </div>
@@ -154,16 +171,15 @@ export default function DashboardPage() {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3 mb-6">
-          {/* Get Rules */}
           <button
             onClick={handleGetRules}
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-5 py-2.5 rounded-xl transition-all text-sm flex items-center gap-2"
+            className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white transition-all bg-blue-600 rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
                 <svg
-                  className="animate-spin w-4 h-4"
+                  className="w-4 h-4 animate-spin"
                   fill="none"
                   viewBox="0 0 24 24"
                 >
@@ -188,34 +204,31 @@ export default function DashboardPage() {
             )}
           </button>
 
-          {/* Enable All */}
           <button
             onClick={() => handleToggleAll(true)}
             disabled={togglingAll || !fetched}
-            className="bg-green-700 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-5 py-2.5 rounded-xl transition-all text-sm"
+            className="px-5 py-2.5 text-sm font-semibold text-white transition-all bg-green-700 rounded-xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {togglingAll ? "Working..." : "Enable All"}
           </button>
 
-          {/* Disable All */}
           <button
             onClick={() => handleToggleAll(false)}
             disabled={togglingAll || !fetched}
-            className="bg-red-700 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-5 py-2.5 rounded-xl transition-all text-sm"
+            className="px-5 py-2.5 text-sm font-semibold text-white transition-all bg-red-700 rounded-xl hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {togglingAll ? "Working..." : "Disable All"}
           </button>
 
-          {/* Deploy */}
           <button
             onClick={handleDeploy}
             disabled={deploying || !fetched}
-            className="bg-purple-700 hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-5 py-2.5 rounded-xl transition-all text-sm flex items-center gap-2"
+            className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white transition-all bg-purple-700 rounded-xl hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {deploying ? (
               <>
                 <svg
-                  className="animate-spin w-4 h-4"
+                  className="w-4 h-4 animate-spin"
                   fill="none"
                   viewBox="0 0 24 24"
                 >
@@ -243,36 +256,36 @@ export default function DashboardPage() {
 
         {/* Rules Table */}
         {!fetched ? (
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-16 text-center">
+          <div className="p-16 text-center bg-gray-900 border border-gray-800 rounded-2xl">
             <svg
-              className="w-12 h-12 text-gray-700 mx-auto mb-4"
+              className="w-12 h-12 mx-auto mb-4 text-gray-700"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
               <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" />
             </svg>
-            <p className="text-gray-500 text-sm">
+            <p className="text-sm text-gray-500">
               Click "Get Validation Rules" to load rules from Salesforce
             </p>
           </div>
         ) : (
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+          <div className="overflow-hidden bg-gray-900 border border-gray-800 rounded-2xl">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-800">
-                  <th className="text-left text-xs text-gray-400 font-medium px-6 py-4">
+                  <th className="px-6 py-4 text-xs font-medium text-left text-gray-400">
                     #
                   </th>
-                  <th className="text-left text-xs text-gray-400 font-medium px-6 py-4">
+                  <th className="px-6 py-4 text-xs font-medium text-left text-gray-400">
                     Rule Name
                   </th>
-                  <th className="text-left text-xs text-gray-400 font-medium px-6 py-4">
+                  <th className="px-6 py-4 text-xs font-medium text-left text-gray-400">
                     Status
                   </th>
-                  <th className="text-left text-xs text-gray-400 font-medium px-6 py-4">
+                  <th className="px-6 py-4 text-xs font-medium text-left text-gray-400">
                     Rule ID
                   </th>
-                  <th className="text-right text-xs text-gray-400 font-medium px-6 py-4">
+                  <th className="px-6 py-4 text-xs font-medium text-right text-gray-400">
                     Action
                   </th>
                 </tr>
@@ -281,44 +294,34 @@ export default function DashboardPage() {
                 {rules.map((rule, index) => (
                   <tr
                     key={rule.Id}
-                    className="border-b border-gray-800 last:border-0 hover:bg-gray-800 transition-colors"
+                    className="transition-colors border-b border-gray-800 last:border-0 hover:bg-gray-800"
                   >
-                    <td className="px-6 py-4 text-gray-500 text-sm">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {index + 1}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-white font-medium text-sm">
+                      <span className="text-sm font-medium text-white">
                         {rule.ValidationName}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
-                          rule.Active
-                            ? "bg-green-900 text-green-300 border border-green-800"
-                            : "bg-red-900 text-red-300 border border-red-800"
-                        }`}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${rule.Active ? "bg-green-900 text-green-300 border border-green-800" : "bg-red-900 text-red-300 border border-red-800"}`}
                       >
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            rule.Active ? "bg-green-400" : "bg-red-400"
-                          }`}
+                          className={`w-1.5 h-1.5 rounded-full ${rule.Active ? "bg-green-400" : "bg-red-400"}`}
                         />
                         {rule.Active ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-500 text-xs font-mono">
+                    <td className="px-6 py-4 font-mono text-xs text-gray-500">
                       {rule.Id}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => handleToggleSingle(rule.Id, rule.Active)}
                         disabled={togglingId === rule.Id}
-                        className={`text-xs font-semibold px-4 py-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                          rule.Active
-                            ? "bg-red-900 hover:bg-red-800 text-red-300 border border-red-800"
-                            : "bg-green-900 hover:bg-green-800 text-green-300 border border-green-800"
-                        }`}
+                        className={`text-xs font-semibold px-4 py-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${rule.Active ? "bg-red-900 hover:bg-red-800 text-red-300 border border-red-800" : "bg-green-900 hover:bg-green-800 text-green-300 border border-green-800"}`}
                       >
                         {togglingId === rule.Id
                           ? "..."

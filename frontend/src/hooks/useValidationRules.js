@@ -4,7 +4,7 @@ import {
   toggleSingleRule,
   toggleAllRules,
   deployChanges,
-} from "../services/salesforceService";
+} from "../services/api";
 
 export const useValidationRules = () => {
   const [rules, setRules] = useState([]);
