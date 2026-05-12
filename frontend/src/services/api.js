@@ -1,13 +1,14 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/salesforce";
+const BASE_URL =
+  "https://salesforce-fullstack-backend.onrender.com/api/salesforce";
 
 const api = axios.create({
   baseURL: BASE_URL,
 });
 
 export const loginToSalesforce = () => {
-  window.location.href = `http://localhost:5000/api/salesforce/login`;
+  window.location.href = `${BASE_URL}/login`;
 };
 
 export const getValidationRules = () => api.get("/validation-rules");
